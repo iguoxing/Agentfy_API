@@ -1,0 +1,80 @@
+
+    <style>
+        #map-container {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=7d41031b34a62530b3cd1eb6bf110f60  "></script>
+
+
+    <div id="map-container"></div>
+
+    <script>
+        // 模拟检测用户是否在国内（实际需要后端或第三方API）
+        async function isInChina() {
+            try {
+                // 使用免费的IP地理位置API（示例：ipapi.co）
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                return data.country_code === 'CN'; // 返回true表示在国内
+            } catch (error) {
+                console.error('无法检测位置，默认为国外:', error);
+                return false; // 默认国外
+            }
+        }
+
+        // 初始化高德地图（国内）
+        function initAMap() {
+            // 动态加载高德地图脚本
+            const script = document.createElement('script');
+            script.src = 'https://webapi.amap.com/maps?v=2.0&key=7d41031b34a62530b3cd1eb6bf110f60';
+            script.onload = () => {
+                const map = new AMap.Map('map-container', {
+                    zoom: 15,
+                    center: [121.615165, 29.86647], // 浙江省宁波市鄞州区民安东路268号
+                    features: ['bg', 'road', 'building'],
+                    scrollWheel: true,
+                    keyboard: false,
+                    dragEnable: true,
+                    doubleClickZoom: false,
+                    touchAction: 'none'
+                });
+
+                const marker = new AMap.Marker({
+                    position: [121.615165, 29.86647],
+                    title: '浙江省宁波市鄞州区民安东路268号(国际金融中心A座)'
+                });
+                marker.setMap(map);
+            };
+            document.head.appendChild(script);
+        }
+
+        // 初始化谷歌地图（国外）
+        function initGoogleMap() {
+            const iframe = document.createElement('iframe');
+            iframe.width = '100%';
+            iframe.height = '400';
+            iframe.frameBorder = '0';
+            iframe.scrolling = 'no';
+            iframe.marginHeight = '0';
+            iframe.marginWidth = '0';
+            iframe.src = 'https://maps.google.com/maps?width=100%25&height=400&hl=en&q=浙江省宁波市鄞州区民安东路268号+(国际金融中心A座)&t=&z=14&ie=UTF8&iwloc=B&output=embed';
+            document.getElementById('map-container').appendChild(iframe);
+        }
+
+        // 根据位置加载地图
+        async function loadMap() {
+            const inChina = await isInChina();
+            if (inChina) {
+                initAMap(); // 国内加载高德地图
+            } else {
+                initGoogleMap(); // 国外加载谷歌地图
+            }
+        }
+
+        // 执行地图加载
+        loadMap();
+    </script>
+
+    
